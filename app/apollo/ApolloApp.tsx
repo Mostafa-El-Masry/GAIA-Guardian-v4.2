@@ -24,7 +24,7 @@ export default function ApolloApp() {
 
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <LinkCard
-            href="/apollo/Academy"
+            href="/apollo/academy"
             title="Academy"
             description="Browse topics and structured lessons to level up."
             icon={
