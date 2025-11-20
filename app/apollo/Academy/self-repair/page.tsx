@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect } from "react";
+import { useAcademyProgress } from "../useAcademyProgress";
 type Lesson = {
   id: string;
   code: string;
@@ -175,6 +179,11 @@ const totalLessons = arcs.reduce(
 );
 
 export default function SelfRepairTrackPage() {
+  const { isLessonCompleted, toggleLessonCompleted, markStudyVisit } = useAcademyProgress();
+
+  useEffect(() => {
+    markStudyVisit("self-repair");
+  }, [markStudyVisit]);
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 space-y-8">
       <header className="space-y-2">
@@ -202,18 +211,31 @@ export default function SelfRepairTrackPage() {
             <h2 className="mt-1 text-sm font-semibold gaia-strong">{arc.title}</h2>
             <p className="mt-2 text-xs gaia-muted">{arc.focus}</p>
 
-            <ul className="mt-3 space-y-1.5 text-xs gaia-muted">
-              {arc.lessons.map((lesson) => (
-                <li
-                  key={lesson.id}
-                  className="flex items-baseline justify-between gap-2 border-b border-white/5 pb-1 last:border-b-0 last:pb-0"
-                >
-                  <span className="gaia-strong text-[11px] w-10">{lesson.code}</span>
-                  <span className="flex-1">{lesson.title}</span>
-                  <span className="text-[11px]">{lesson.estimate}</span>
-                </li>
-              ))}
-            </ul>
+            
+<ul className="mt-3 space-y-1.5 text-xs gaia-muted">
+  {section.lessons.map((lesson) => (
+    <li
+      id={lesson.id}
+      key={lesson.id}
+      className="flex items-baseline justify-between gap-2 border-b border-white/5 pb-1 last:border-b-0 last:pb-0"
+    >
+      <button
+        type="button"
+        onClick={() => toggleLessonCompleted("self-repair", lesson.id)}
+        className="flex w-full items-baseline justify-between gap-2 text-left"
+      >
+        <span className="text-[11px] w-4">
+          {isLessonCompleted("self-repair", lesson.id) ? "✓" : ""}
+        </span>
+        <span className="gaia-strong text-[11px] w-10">
+          {lesson.code}
+        </span>
+        <span className="flex-1">{lesson.title}</span>
+        <span className="text-[11px]">{lesson.estimate}</span>
+      </button>
+    </li>
+  ))}
+</ul>
           </article>
         ))}
       </section>

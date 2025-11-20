@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect } from "react";
+import { useAcademyProgress } from "../useAcademyProgress";
 type Lesson = {
   id: string;
   code: string;
@@ -217,26 +221,33 @@ const arcs: Arc[] = [
   },
 ];
 
-const totalLessons = arcs.reduce(
-  (sum, arc) => sum + arc.lessons.length,
-  0
-);
+const totalLessons = arcs.reduce((sum, arc) => sum + arc.lessons.length, 0);
 
 export default function AccountingTrackPage() {
+  const { isLessonCompleted, toggleLessonCompleted, markStudyVisit } =
+    useAcademyProgress();
+
+  useEffect(() => {
+    markStudyVisit("accounting");
+  }, [markStudyVisit]);
   const totalMonths = "≈ 18 months at your current 3 days/week rhythm";
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 space-y-8">
       <header className="space-y-2">
-        <h1 className="text-2xl font-semibold">Accounting · Keeper of Numbers</h1>
+        <h1 className="text-2xl font-semibold">
+          Accounting · Keeper of Numbers
+        </h1>
         <p className="text-sm gaia-muted max-w-2xl">
-          This track is about taking back control at work. You&apos;re not bad at accounting —
-          you&apos;ve been working under stress and chaos. Here, we rebuild the base slowly and
-          deliberately, using your real job as practice.
+          This track is about taking back control at work. You&apos;re not bad
+          at accounting — you&apos;ve been working under stress and chaos. Here,
+          we rebuild the base slowly and deliberately, using your real job as
+          practice.
         </p>
         <p className="text-xs gaia-muted mt-1">
-          Total planned lessons: <span className="gaia-strong">{totalLessons}</span> · Planned
-          path: <span className="gaia-strong">{totalMonths}</span>
+          Total planned lessons:{" "}
+          <span className="gaia-strong">{totalLessons}</span> · Planned path:{" "}
+          <span className="gaia-strong">{totalMonths}</span>
         </p>
       </header>
 
@@ -249,18 +260,34 @@ export default function AccountingTrackPage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] gaia-muted">
               {arc.label}
             </p>
-            <h2 className="mt-1 text-sm font-semibold gaia-strong">{arc.title}</h2>
+            <h2 className="mt-1 text-sm font-semibold gaia-strong">
+              {arc.title}
+            </h2>
             <p className="mt-2 text-xs gaia-muted">{arc.focus}</p>
 
             <ul className="mt-3 space-y-1.5 text-xs gaia-muted">
               {arc.lessons.map((lesson) => (
                 <li
+                  id={lesson.id}
                   key={lesson.id}
                   className="flex items-baseline justify-between gap-2 border-b border-white/5 pb-1 last:border-b-0 last:pb-0"
                 >
-                  <span className="gaia-strong text-[11px] w-10">{lesson.code}</span>
-                  <span className="flex-1">{lesson.title}</span>
-                  <span className="text-[11px]">{lesson.estimate}</span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      toggleLessonCompleted("accounting", lesson.id)
+                    }
+                    className="flex w-full items-baseline justify-between gap-2 text-left"
+                  >
+                    <span className="text-[11px] w-4">
+                      {isLessonCompleted("accounting", lesson.id) ? "✓" : ""}
+                    </span>
+                    <span className="gaia-strong text-[11px] w-10">
+                      {lesson.code}
+                    </span>
+                    <span className="flex-1">{lesson.title}</span>
+                    <span className="text-[11px]">{lesson.estimate}</span>
+                  </button>
                 </li>
               ))}
             </ul>

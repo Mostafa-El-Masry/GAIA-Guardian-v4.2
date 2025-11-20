@@ -1,7 +1,11 @@
+"use client";
+
 import ClientView from "../ClientView";
+import { useEffect, useState } from "react";
+import { useAcademyProgress } from "../useAcademyProgress";
+import { ProgrammingLessonContent } from "./lessonContent";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 type Lesson = {
   id: string;
@@ -294,17 +298,40 @@ const totalLessons = sections.reduce(
 );
 
 export default function ProgrammingTrackPage() {
+  const { isLessonCompleted, toggleLessonCompleted, markStudyVisit } =
+    useAcademyProgress();
+  const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
+
+  useEffect(() => {
+    markStudyVisit("programming");
+  }, [markStudyVisit]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash.replace("#", "");
+    if (hash) {
+      setActiveLessonId(hash);
+    }
+  }, []);
+
+  const allLessons: Lesson[] = sections.flatMap((section) => section.lessons);
+  const activeLesson =
+    activeLessonId && allLessons.find((l) => l.id === activeLessonId);
+
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 space-y-8">
       <header className="space-y-2">
-        <h1 className="text-2xl font-semibold">Web Programming · Builder of Worlds</h1>
+        <h1 className="text-2xl font-semibold">
+          Web Programming · Builder of Worlds
+        </h1>
         <p className="text-sm gaia-muted max-w-2xl">
-          From &quot;I don&apos;t know anything&quot; to building real GAIA-style apps. You study
-          three days per week in small blocks, and measure progress by completed lessons, not by
-          how fast you sprint.
+          From &quot;I don&apos;t know anything&quot; to building real
+          GAIA-style apps. You study three days per week in small blocks, and
+          measure progress by completed lessons, not by how fast you sprint.
         </p>
         <p className="text-xs gaia-muted mt-1">
-          Total planned lessons: <span className="gaia-strong">{totalLessons}</span>
+          Total planned lessons:{" "}
+          <span className="gaia-strong">{totalLessons}</span>
         </p>
       </header>
 
@@ -317,31 +344,52 @@ export default function ProgrammingTrackPage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] gaia-muted">
               {section.label}
             </p>
-            <h2 className="mt-1 text-sm font-semibold gaia-strong">{section.title}</h2>
+            <h2 className="mt-1 text-sm font-semibold gaia-strong">
+              {section.title}
+            </h2>
             <p className="mt-2 text-xs gaia-muted">{section.focus}</p>
 
-            <ul className="mt-3 space-y-1.5 text-xs gaia-muted">
-              {section.lessons.map((lesson) => (
-                <li
-                  key={lesson.id}
-                  className="flex items-baseline justify-between gap-2 border-b border-white/5 pb-1 last:border-b-0 last:pb-0"
-                >
-                  <span className="gaia-strong text-[11px] w-10">{lesson.code}</span>
-                  <span className="flex-1">{lesson.title}</span>
-                  <span className="text-[11px]">{lesson.estimate}</span>
-                </li>
-              ))}
-            </ul>
-          </article>
-        ))}
-      </section>
+      <ul className="mt-3 space-y-1.5 text-xs gaia-muted">
+        {section.lessons.map((lesson) => (
+          <li
+            id={lesson.id}
+            key={lesson.id}
+            className="flex items-baseline justify-between gap-2 border-b border-white/5 pb-1 last:border-b-0 last:pb-0 cursor-pointer"
+            onClick={() => setActiveLessonId(lesson.id)}
+          >
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                toggleLessonCompleted("programming", lesson.id);
+              }}
+              className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-white/30 text-[11px]"
+              aria-label={
+                isLessonCompleted("programming", lesson.id)
+                  ? "Mark lesson as not completed"
+                  : "Mark lesson as completed"
+              }
+            >
+              {isLessonCompleted("programming", lesson.id) ? "✓" : ""}
+            </button>
 
+            <span className="gaia-strong text-[11px] w-10">
+              {lesson.code}
+            </span>
+            <span className="flex-1">{lesson.title}</span>
+            <span className="text-[11px]">{lesson.estimate}</span>
+          </li>
+        ))}
+      </ul>
+    </article>
+  ))}
+</section>
       <section className="mt-4">
         <div className="rounded-2xl gaia-panel-soft p-4 sm:p-5 shadow-sm border border-dashed border-white/10">
           <p className="text-xs gaia-muted">
-            Below this structure, your existing study view can live. For now, it&apos;s just
-            connected as a placeholder so you can keep using what you already have while this
-            structure grows.
+            Below this structure, your existing study view can live. For now,
+            it&apos;s just connected as a placeholder so you can keep using what
+            you already have while this structure grows.
           </p>
           <div className="mt-3 rounded-xl bg-black/20 p-3">
             <ClientView />
