@@ -23,7 +23,7 @@ const CodePlayground = ({
       );
     } else {
       setPreviewDoc(
-        `<!DOCTYPE html><html><head></head><body><pre>JS preview is not fully implemented yet.</pre><script>${code}<\/script></body></html>`
+        `<!DOCTYPE html><html><head></head><body><pre>JS preview is basic here. Focus on the code behaviour, not the visual output.</pre><script>${code}<\/script></body></html>`
       );
     }
   }, [code, language]);
