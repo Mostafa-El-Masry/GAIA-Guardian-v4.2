@@ -1,18 +1,16 @@
-
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAcademyProgress } from "../useAcademyProgress";
 import { programmingLessons } from "../lessonsMap";
 import ProgrammingLessonContent from "./lessonContent";
-
-export const dynamic = "force-dynamic";
 
 type Lesson = {
   id: string;
   code: string;
   title: string;
   estimate: string;
+  arcId: string;
 };
 
 type Section = {
@@ -23,131 +21,160 @@ type Section = {
   lessons: Lesson[];
 };
 
-const makeLesson = (code: string, estimate: string): Lesson => {
+const makeLesson = (code: string, estimate: string, arcId: string): Lesson => {
   const meta = programmingLessons.find(
     (l) => l.code === code && l.trackId === "programming"
   );
+
   if (!meta) {
     return {
       id: `missing-${code}`,
       code,
       title: `Missing lesson for code ${code}`,
       estimate,
+      arcId,
     };
   }
+
   return {
     id: meta.id,
     code: meta.code,
     title: meta.title,
     estimate,
+    arcId,
   };
 };
 
 const sections: Section[] = [
   {
-    id: "arc-1",
-    label: "Arc 1 · Foundations",
-    title: "How the Web Works & Your Tools",
+    id: "foundations",
+    label: "Foundations",
+    title: "First steps and mental model",
     focus:
-      "Understand browsers, servers, and the tools you will use so nothing feels like magic.",
+      "See the whole map: how the web works, your tools, and a learning rhythm that respects your energy.",
     lessons: [
-      makeLesson("1.1", "30–45 min"),
-      makeLesson("1.2", "45–60 min"),
-      makeLesson("1.3", "45–60 min"),
+      makeLesson("1.1", "30–45 min", "foundations"),
+      makeLesson("1.2", "45–60 min", "foundations"),
+      makeLesson("1.3", "45–60 min", "foundations"),
     ],
   },
   {
-    id: "arc-2",
-    label: "Arc 2 · HTML",
-    title: "HTML Structure & Semantics",
+    id: "html",
+    label: "HTML",
+    title: "Structure and meaning",
     focus:
-      "Learn how to structure pages with clean, semantic HTML that GAIA can read easily later.",
+      "Learn how to structure pages with clean, semantic HTML that GAIA can understand easily later.",
     lessons: [
-      makeLesson("2.1", "60–90 min"),
-      makeLesson("2.2", "60–90 min"),
-      makeLesson("2.3", "45–60 min"),
-      makeLesson("2.4", "60–90 min"),
-      makeLesson("2.5", "45–60 min"),
+      makeLesson("2.1", "45–60 min", "html"),
+      makeLesson("2.2", "60–90 min", "html"),
+      makeLesson("2.3", "60–90 min", "html"),
+      makeLesson("2.4", "60–90 min", "html"),
+      makeLesson("2.5", "45–60 min", "html"),
     ],
   },
   {
-    id: "arc-3",
-    label: "Arc 3 · CSS & Tailwind",
-    title: "Styling, Layouts, and Tailwind Basics",
+    id: "css",
+    label: "CSS / Tailwind",
+    title: "Styling and layouts",
     focus:
-      "Control layout, spacing, and typography, then move to faster styling with Tailwind.",
+      "Control layout, spacing, and typography, then move into faster styling with Tailwind.",
     lessons: [
-      makeLesson("3.1", "60–90 min"),
-      makeLesson("3.2", "60–90 min"),
-      makeLesson("3.3", "60–90 min"),
-      makeLesson("3.4", "60–90 min"),
-      makeLesson("3.5", "60–90 min"),
-      makeLesson("3.6", "60–90 min"),
+      makeLesson("3.1", "60–90 min", "css"),
+      makeLesson("3.2", "60–90 min", "css"),
+      makeLesson("3.3", "60–90 min", "css"),
+      makeLesson("3.4", "60–90 min", "css"),
+      makeLesson("3.5", "60–90 min", "css"),
+      makeLesson("3.6", "60–90 min", "css"),
     ],
   },
   {
-    id: "arc-4",
-    label: "Arc 4 · JavaScript",
-    title: "JavaScript Fundamentals",
+    id: "javascript",
+    label: "JavaScript",
+    title: "Logic and interaction",
     focus:
-      "Build the logic layer so you can interact with users, data, and APIs.",
+      "Build the logic layer so you can interact with users, data, and APIs in GAIA-style apps.",
     lessons: [
-      makeLesson("4.1", "60–90 min"),
-      makeLesson("4.2", "60–90 min"),
-      makeLesson("4.3", "60–90 min"),
-      makeLesson("4.4", "60–90 min"),
-      makeLesson("4.5", "60–90 min"),
-      makeLesson("4.6", "60–90 min"),
-      makeLesson("4.7", "60–90 min"),
+      makeLesson("4.1", "60–90 min", "javascript"),
+      makeLesson("4.2", "60–90 min", "javascript"),
+      makeLesson("4.3", "60–90 min", "javascript"),
+      makeLesson("4.4", "60–90 min", "javascript"),
+      makeLesson("4.5", "60–90 min", "javascript"),
+      makeLesson("4.6", "60–90 min", "javascript"),
+      makeLesson("4.7", "60–90 min", "javascript"),
     ],
   },
   {
-    id: "arc-5",
-    label: "Arc 5 · React & Next.js",
-    title: "Components, State, and Next.js",
+    id: "react-next",
+    label: "React / Next.js",
+    title: "Components and pages",
     focus:
       "Move from static pages to interactive apps using React and Next.js like GAIA itself.",
     lessons: [
-      makeLesson("5.1", "60–90 min"),
-      makeLesson("5.2", "60–90 min"),
-      makeLesson("5.3", "60–90 min"),
-      makeLesson("5.4", "60–90 min"),
-      makeLesson("5.5", "60–90 min"),
+      makeLesson("5.1", "60–90 min", "react-next"),
+      makeLesson("5.2", "60–90 min", "react-next"),
+      makeLesson("5.3", "60–90 min", "react-next"),
+      makeLesson("5.4", "60–90 min", "react-next"),
+      makeLesson("5.5", "60–90 min", "react-next"),
     ],
   },
   {
-    id: "arc-6",
-    label: "Arc 6 · Databases & Supabase",
-    title: "Data, Auth, and CRUD",
+    id: "supabase",
+    label: "Supabase",
+    title: "Data and auth",
     focus:
-      "Learn how to store your data remotely and keep it in sync, just like GAIA Awakening.",
+      "Store your data remotely and keep it in sync, just like GAIA Awakening will do.",
     lessons: [
-      makeLesson("6.1", "60–90 min"),
-      makeLesson("6.2", "60–90 min"),
-      makeLesson("6.3", "60–90 min"),
-      makeLesson("6.4", "60–90 min"),
+      makeLesson("6.1", "60–90 min", "supabase"),
+      makeLesson("6.2", "60–90 min", "supabase"),
+      makeLesson("6.3", "60–90 min", "supabase"),
+      makeLesson("6.4", "60–90 min", "supabase"),
     ],
   },
   {
-    id: "arc-7",
-    label: "Arc 7 · Capstone",
-    title: "Build and Connect a Real Project",
+    id: "capstone",
+    label: "Capstone",
+    title: "Small GAIA-style project",
     focus:
       "Plan, build, and polish a small GAIA-style app and connect it into the main system.",
     lessons: [
-      makeLesson("7.1", "60–90 min"),
-      makeLesson("7.2", "60–120 min"),
-      makeLesson("7.3", "60–120 min"),
-      makeLesson("7.4", "60–120 min"),
+      makeLesson("7.1", "60–90 min", "capstone"),
+      makeLesson("7.2", "60–120 min", "capstone"),
+      makeLesson("7.3", "60–120 min", "capstone"),
+      makeLesson("7.4", "60–120 min", "capstone"),
     ],
   },
 ];
+
+const arcFilters: { id: "all" | Section["id"]; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "foundations", label: "Foundations" },
+  { id: "html", label: "HTML" },
+  { id: "css", label: "CSS / Tailwind" },
+  { id: "javascript", label: "JavaScript" },
+  { id: "react-next", label: "React / Next.js" },
+  { id: "supabase", label: "Supabase" },
+  { id: "capstone", label: "Capstone" },
+];
+
+function isLessonLocked(
+  lesson: Lesson,
+  allLessons: Lesson[],
+  isLessonCompleted: (trackId: string, lessonId: string) => boolean
+): boolean {
+  const index = allLessons.findIndex((l) => l.id === lesson.id);
+  if (index <= 0) return false;
+  const previous = allLessons.slice(0, index);
+  return previous.some((prev) => !isLessonCompleted("programming", prev.id));
+}
 
 export default function ProgrammingTrackPage() {
   const { isLessonCompleted, toggleLessonCompleted, markStudyVisit } =
     useAcademyProgress();
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const [showSections, setShowSections] = useState<boolean>(true);
+  const [activeArcFilter, setActiveArcFilter] = useState<
+    "all" | Section["id"]
+  >("all");
 
   useEffect(() => {
     markStudyVisit("programming");
@@ -162,7 +189,11 @@ export default function ProgrammingTrackPage() {
     }
   }, []);
 
-  const allLessons: Lesson[] = sections.flatMap((section) => section.lessons);
+  const allLessons: Lesson[] = useMemo(
+    () => sections.flatMap((section) => section.lessons),
+    []
+  );
+
   const activeLesson =
     activeLessonId && allLessons.find((l) => l.id === activeLessonId);
 
@@ -175,8 +206,13 @@ export default function ProgrammingTrackPage() {
       ? 0
       : Math.round((completedCount / totalProgrammingLessons) * 100);
 
+  const visibleSections =
+    activeArcFilter === "all"
+      ? sections
+      : sections.filter((s) => s.id === activeArcFilter);
+
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8 space-y-8">
+    <main className="mx-auto max-w-5xl px-3 sm:px-4 py-6 space-y-4 sm:space-y-6">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.22em] gaia-muted">
@@ -204,6 +240,23 @@ export default function ProgrammingTrackPage() {
         </div>
       </header>
 
+      <div className="flex flex-wrap gap-2">
+        {arcFilters.map((filter) => (
+          <button
+            key={filter.id}
+            type="button"
+            onClick={() => setActiveArcFilter(filter.id)}
+            className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-[11px] sm:text-xs font-semibold border ${
+              activeArcFilter === filter.id
+                ? "bg-white text-black border-white"
+                : "bg-black/40 text-white border-white/20 hover:border-white/40"
+            }`}
+          >
+            {filter.label}
+          </button>
+        ))}
+      </div>
+
       <section className="space-y-4 mt-2">
         <article className="rounded-2xl gaia-panel-soft p-4 sm:p-5 shadow-sm border border-white/5">
           {activeLesson ? (
@@ -215,7 +268,7 @@ export default function ProgrammingTrackPage() {
                 {activeLesson.code} · {activeLesson.title}
               </h2>
               <ProgrammingLessonContent
-                lessonId={activeLesson.code}
+                lessonCode={activeLesson.code}
                 isCompleted={isLessonCompleted("programming", activeLesson.id)}
                 onLessonCompleted={() => {
                   if (!isLessonCompleted("programming", activeLesson.id)) {
@@ -253,7 +306,7 @@ export default function ProgrammingTrackPage() {
 
         {showSections && (
           <>
-            {sections.map((section) => (
+            {visibleSections.map((section) => (
               <article
                 key={section.id}
                 className="rounded-2xl gaia-panel-soft p-4 sm:p-5 shadow-sm border border-white/5"
@@ -269,37 +322,59 @@ export default function ProgrammingTrackPage() {
                 </p>
 
                 <ul className="mt-3 space-y-1.5 text-xs sm:text-sm gaia-muted">
-                  {section.lessons.map((lesson) => (
-                    <li
-                      id={lesson.id}
-                      key={lesson.id}
-                      className="flex items-baseline justify-between gap-2 border-b border-white/5 pb-1 last:border-b-0 last:pb-0 cursor-pointer"
-                      onClick={() => {
-                        setActiveLessonId(lesson.id);
-                        setShowSections(false);
-                      }}
-                    >
-                      <span
-                        className={`inline-flex h-5 w-5 items-center justify-center rounded-full border border-white/30 text-[11px] sm:text-xs ${
-                          isLessonCompleted("programming", lesson.id)
-                            ? "bg-white text-black font-semibold"
-                            : ""
-                        }`}
-                        aria-hidden="true"
-                      >
-                        {isLessonCompleted("programming", lesson.id) ? "✓" : ""}
-                      </span>
+                  {section.lessons.map((lesson) => {
+                    const locked = isLessonLocked(
+                      lesson,
+                      allLessons,
+                      isLessonCompleted
+                    );
+                    const completed = isLessonCompleted(
+                      "programming",
+                      lesson.id
+                    );
 
-                      <span className="gaia-strong text-[11px] sm:text-xs w-10">
-                        {lesson.code}
-                      </span>
-                      <span className="flex-1">{lesson.title}</span>
-                      <span className="text-[11px] sm:text-xs">
-                        {lesson.estimate}
-                      </span>
-                    </li>
-                  ))}
+                    return (
+                      <li
+                        id={lesson.id}
+                        key={lesson.id}
+                        className={`flex items-baseline justify-between gap-2 border-b border-white/5 pb-1 last:border-b-0 last:pb-0 ${
+                          locked
+                            ? "opacity-50 cursor-not-allowed"
+                            : "cursor-pointer hover:bg-white/5"
+                        }`}
+                        onClick={() => {
+                          if (locked) return;
+                          setActiveLessonId(lesson.id);
+                          setShowSections(false);
+                        }}
+                      >
+                        <span
+                          className={`inline-flex h-5 w-5 items-center justify-center rounded-full border border-white/30 text-[11px] sm:text-xs ${
+                            completed
+                              ? "bg-white text-black font-semibold"
+                              : ""
+                          }`}
+                          aria-hidden="true"
+                        >
+                          {completed ? "✓" : locked ? "•" : ""}
+                        </span>
+
+                        <span className="gaia-strong text-[11px] sm:text-xs w-10">
+                          {lesson.code}
+                        </span>
+                        <span className="flex-1">{lesson.title}</span>
+                        <span className="text-[11px] sm:text-xs">
+                          {lesson.estimate}
+                        </span>
+                      </li>
+                    );
+                  })}
                 </ul>
+
+                <p className="mt-2 text-[11px] sm:text-xs gaia-muted">
+                  You must complete each lesson in order. Locked lessons will
+                  unlock automatically when previous lessons are completed.
+                </p>
               </article>
             ))}
           </>
