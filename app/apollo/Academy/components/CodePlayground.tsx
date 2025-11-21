@@ -1,53 +1,56 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
 
-type Props = {
-  initialHtml: string;
+type CodePlaygroundProps = {
+  initialCode?: string;
+  language?: "html" | "css" | "js";
 };
 
-export default function CodePlayground({ initialHtml }: Props) {
-  const [html, setHtml] = useState(initialHtml);
-  const [srcDoc, setSrcDoc] = useState(initialHtml);
+const CodePlayground = ({
+  initialCode = "",
+  language = "html",
+}: CodePlaygroundProps) => {
+  const [code, setCode] = useState(initialCode);
+  const [previewDoc, setPreviewDoc] = useState("");
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setSrcDoc(html);
-    }, 300);
-
-    return () => clearTimeout(timeout);
-  }, [html]);
+    if (language === "html") {
+      setPreviewDoc(code);
+    } else if (language === "css") {
+      setPreviewDoc(
+        `<!DOCTYPE html><html><head><style>${code}</style></head><body><div class="preview-target">Preview area</div></body></html>`
+      );
+    } else {
+      setPreviewDoc(
+        `<!DOCTYPE html><html><head></head><body><pre>JS preview is not fully implemented yet.</pre><script>${code}<\/script></body></html>`
+      );
+    }
+  }, [code, language]);
 
   return (
-    <div className="mt-3 grid gap-3 md:grid-cols-2">
-      <div className="flex flex-col gap-2">
-        <p className="text-[11px] gaia-muted uppercase tracking-[0.22em]">
-          HTML editor
-        </p>
+    <div className="grid gap-3 sm:grid-cols-2">
+      <div className="space-y-1">
+        <p className="text-[11px] sm:text-xs gaia-muted">Your code</p>
         <textarea
-          value={html}
-          onChange={(event) => setHtml(event.target.value)}
-          className="min-h-[220px] w-full rounded-lg border border-white/15 bg-black/40 p-2 font-mono text-xs leading-snug text-slate-50"
-          spellCheck={false}
+          className="h-40 w-full rounded-xl border border-white/15 bg-black/40 p-2 text-xs sm:text-sm text-white outline-none focus:border-white/40"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
         />
-        <p className="text-[11px] gaia-muted">
-          Edit the code and wait a moment. The preview on the right will
-          update automatically.
-        </p>
       </div>
-
-      <div className="flex flex-col gap-2">
-        <p className="text-[11px] gaia-muted uppercase tracking-[0.22em]">
-          Preview
-        </p>
-        <div className="relative w-full overflow-hidden rounded-lg border border-white/15 bg-white">
+      <div className="space-y-1">
+        <p className="text-[11px] sm:text-xs gaia-muted">Preview</p>
+        <div className="h-40 w-full overflow-hidden rounded-xl border border-white/15 bg-black">
           <iframe
-            title="Code playground preview"
-            srcDoc={srcDoc}
-            className="h-64 w-full"
+            title="Code preview"
+            className="h-full w-full border-0"
+            srcDoc={previewDoc}
           />
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default CodePlayground;
